@@ -8,8 +8,6 @@ const port = 3000;
 
 app.use(express.static("public"));
 
-// console.log(process.env);
-
 // Bybit API
 const bybitApiUrl = "https://api.bybit.nl";
 const bybitApiKey = process.env.BYBIT_API_KEY;
