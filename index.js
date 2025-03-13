@@ -19,23 +19,33 @@ const category = "spot";
 const symbol = "BTCUSDT";
 
 app.get("/", async (req, res) => {
-  const queryString = `category=${category}&symbol=${symbol}`;
-  const signature = CryptoJS.HmacSHA256(queryString, bybitApiSecret).toString();
-  const timeStamp = Date.now().toString();
-  const result = await axios.get(
-    `${bybitApiUrl}/v5/market/tickers?${queryString}`,
-    {
-      headers: {
-        "X-BAPI-API-KEY": bybitApiKey,
-        "X-BAPI-TIMESTAMP": timeStamp,
-        "X-BAPI-SIGN": signature,
-        "X-BAPI-RECV-WINDOW": recvWindow,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-  console.log(result.data.result);
-  res.render("index.ejs", { price: result.data.result.list[0].lastPrice });
+  try {
+    const queryString = `category=${category}&symbol=${symbol}`;
+    const signature = CryptoJS.HmacSHA256(
+      queryString,
+      bybitApiSecret
+    ).toString();
+    const timeStamp = Date.now().toString();
+    const result = await axios.get(
+      `${bybitApiUrl}/v5/market/tickers?${queryString}`,
+      {
+        headers: {
+          "X-BAPI-API-KEY": bybitApiKey,
+          "X-BAPI-TIMESTAMP": timeStamp,
+          "X-BAPI-SIGN": signature,
+          "X-BAPI-RECV-WINDOW": recvWindow,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(result.data.result);
+    res.render("index.ejs", {
+      price: `$${result.data.result.list[0].lastPrice}`,
+    });
+  } catch (error) {
+    console.log(error);
+    res.render("index.ejs", { price: "Could not retrieve price" });
+  }
 });
 
 app.listen(port, () => {
